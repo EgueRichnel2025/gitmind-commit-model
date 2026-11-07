@@ -33,8 +33,8 @@ secondary:
     project: project
     hash: hash
   dataset_license: CC-BY-NC-4.0
-  allow_training: true
-  usage_policy: non-commercial-only
+  allow_training: false
+  usage_policy: excluded-from-current-experiment
   attribution_required: true
   commercial_use_allowed: false
   license_url: https://creativecommons.org/licenses/by-nc/4.0/
