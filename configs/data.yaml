@@ -18,7 +18,10 @@ primary:
   license_policy:
     field: license
     require_review: true
-    approved_values: []
+    approved_values:
+    - Apache License 2.0
+    - MIT License
+    - BSD 3-Clause New or Revised License
     allow_training_before_review: false
 secondary:
   name: commitbench

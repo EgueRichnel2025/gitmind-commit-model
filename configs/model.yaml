@@ -1,5 +1,4 @@
-# Initial model configuration.
-# The checkpoint remains a candidate until the experiments are completed.
+# Initial experimental configuration.
 
 model:
   pretrained_checkpoint: "Salesforce/codet5-small"
@@ -10,10 +9,16 @@ model:
 
 tokenization:
   source_max_length: 512
-  target_max_length: 64
-  truncation: true
+  target_max_length: 128
+  truncation: false
+
+chunking:
+  strategy: "per_file_token_windows"
+  overlap_tokens: 32
+  supervision: "repeat_commit_message_per_chunk"
+  experimental: true
 
 generation:
   num_return_sequences: 3
   num_beams: 5
-  max_new_tokens: 64
+  max_new_tokens: 128
