@@ -97,3 +97,18 @@ CommitBench is reserved for restricted experimentation.
 
 No large-scale download or model training is authorized
 by this preliminary inventory.
+
+## CommitBench: non-commercial usage
+
+GitMind is currently developed for personal, educational and
+non-commercial purposes.
+
+CommitBench may therefore be used for non-commercial experiments
+under CC BY-NC 4.0.
+
+Attribution and license notices must be preserved.
+Any modifications must be documented.
+
+Commercial reuse requires a separate license review.
+Public distribution of trained model weights also requires
+a review of the applicable rights and conditions.

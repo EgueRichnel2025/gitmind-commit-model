@@ -1,15 +1,12 @@
 version: 1
-
 primary:
   name: commit-chronicle
   repository: JetBrains-Research/commit-chronicle
   configuration: default
-
   splits:
     train: train
     validation: validation
     test: test
-
   fields:
     repository: repo
     message: message
@@ -18,32 +15,30 @@ primary:
     language: language
     license: license
     file_diff: diff
-
   license_policy:
     field: license
     require_review: true
     approved_values: []
     allow_training_before_review: false
-
 secondary:
   name: commitbench
   repository: Maxscha/commitbench
-
   files:
     train: train.csv
     validation: val.csv
     test: test.csv
-
   fields:
     diff: diff
     message: message
     project: project
     hash: hash
-
   dataset_license: CC-BY-NC-4.0
-  allow_training: false
-  usage_policy: non-commercial-use-only
-
+  allow_training: true
+  usage_policy: non-commercial-only
+  attribution_required: true
+  commercial_use_allowed: false
+  license_url: https://creativecommons.org/licenses/by-nc/4.0/
+  trained_weights_release_review_required: true
 exploration:
   mode: streaming
   sample_size_per_split: 1000
