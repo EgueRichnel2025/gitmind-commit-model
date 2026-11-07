@@ -1,0 +1,19 @@
+# Initial model configuration.
+# The checkpoint remains a candidate until the experiments are completed.
+
+model:
+  pretrained_checkpoint: "Salesforce/codet5-small"
+  architecture: "encoder-decoder"
+  task: "conditional-text-generation"
+  input_description: "Git diff"
+  output_description: "Git commit message"
+
+tokenization:
+  source_max_length: 512
+  target_max_length: 64
+  truncation: true
+
+generation:
+  num_return_sequences: 3
+  num_beams: 5
+  max_new_tokens: 64

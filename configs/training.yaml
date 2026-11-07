@@ -1,0 +1,19 @@
+# Preliminary training configuration.
+# Hardware-dependent parameters will be adjusted in Google Colab.
+
+seed: 42
+
+dataset:
+  train_ratio: 0.80
+  validation_ratio: 0.10
+  test_ratio: 0.10
+  split_strategy: "by_repository"
+
+training:
+  num_train_epochs: 3
+  learning_rate: 0.00005
+  weight_decay: 0.01
+  warmup_ratio: 0.10
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  precision: "auto"
