@@ -1,0 +1,56 @@
+version: 1
+
+primary:
+  name: commit-chronicle
+  repository: JetBrains-Research/commit-chronicle
+  configuration: default
+
+  splits:
+    train: train
+    validation: validation
+    test: test
+
+  fields:
+    repository: repo
+    message: message
+    original_message: original_message
+    modifications: mods
+    language: language
+    license: license
+    file_diff: diff
+
+  license_policy:
+    field: license
+    require_review: true
+    approved_values: []
+    allow_training_before_review: false
+
+secondary:
+  name: commitbench
+  repository: Maxscha/commitbench
+
+  files:
+    train: train.csv
+    validation: val.csv
+    test: test.csv
+
+  fields:
+    diff: diff
+    message: message
+    project: project
+    hash: hash
+
+  dataset_license: CC-BY-NC-4.0
+  allow_training: false
+  usage_policy: non-commercial-use-only
+
+exploration:
+  mode: streaming
+  sample_size_per_split: 1000
+  random_seed: 42
+  inspect_missing_values: true
+  inspect_duplicates: true
+  inspect_diff_lengths: true
+  inspect_message_lengths: true
+  inspect_languages: true
+  inspect_licenses: true
