@@ -136,7 +136,44 @@ def test_chunks_keep_commit_metadata_and_target() -> None:
         assert chunk.commit_hash == "abc123"
         assert chunk.target_message == "fix(api): correct user lookup"
         assert chunk.file_path == "src/user.py"
+        assert chunk.file_section_index == 0
+        assert chunk.source_token_count == 100
 
     assert [chunk.chunk_index for chunk in chunks] == list(range(len(chunks)))
 
     assert all(chunk.chunk_count == len(chunks) for chunk in chunks)
+
+
+def test_multi_file_chunks_keep_section_indexes() -> None:
+    record = make_record()
+
+    record = CommitRecord(
+        repository=record.repository,
+        commit_hash=record.commit_hash,
+        language=record.language,
+        license=record.license,
+        target_message=record.target_message,
+        file_sections=(
+            *record.file_sections,
+            FileSection(
+                path="src/second.py",
+                change_type="ADD",
+                diff=" ".join(f"second{i}" for i in range(50)),
+            ),
+        ),
+    )
+
+    chunks = chunk_commit_record(
+        record,
+        FakeTokenizer(),
+        max_source_tokens=20,
+        overlap_tokens=3,
+    )
+
+    assert {chunk.file_section_index for chunk in chunks} == {0, 1}
+
+    assert {chunk.file_path for chunk in chunks} == {"src/user.py", "src/second.py"}
+
+    assert all(chunk.source_token_count == 100 for chunk in chunks if chunk.file_section_index == 0)
+
+    assert all(chunk.source_token_count == 50 for chunk in chunks if chunk.file_section_index == 1)

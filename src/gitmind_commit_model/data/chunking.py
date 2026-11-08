@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Protocol
 
-from gitmind_commit_model.data.records import CommitRecord
+from gitmind_commit_model.data.records import CommitRecord, FileSection
 
 
 class TokenizerProtocol(Protocol):
@@ -37,6 +37,8 @@ class PreparedChunk:
 
     file_path: str
     change_type: str
+    file_section_index: int
+    source_token_count: int
 
     chunk_index: int
     chunk_count: int
@@ -52,6 +54,7 @@ def split_token_ids(
     overlap_tokens: int = 0,
 ) -> list[list[int]]:
     """Split token IDs into overlapping windows without losing tokens."""
+
     if max_tokens < 1:
         raise ValueError("max_tokens must be at least 1.")
 
@@ -93,6 +96,7 @@ def chunk_commit_record(
     Every chunk receives the global commit message as its target.
     This is an experimental weak-supervision strategy.
     """
+
     if max_source_tokens < 8:
         raise ValueError("max_source_tokens is too small.")
 
@@ -101,9 +105,9 @@ def chunk_commit_record(
 
     special_tokens = tokenizer.num_special_tokens_to_add(pair=False)
 
-    prepared = []
+    prepared: list[tuple[FileSection, int, int, str, int]] = []
 
-    for section in record.file_sections:
+    for file_section_index, section in enumerate(record.file_sections):
         header = f"File: {section.path}\nChange type: {section.change_type}\nDiff:\n"
 
         header_ids = tokenizer.encode(
@@ -118,6 +122,8 @@ def chunk_commit_record(
 
         if not body_ids:
             continue
+
+        source_token_count = len(body_ids)
 
         body_budget = max_source_tokens - len(header_ids) - special_tokens
 
@@ -174,6 +180,8 @@ def chunk_commit_record(
                 prepared.extend(
                     (
                         section,
+                        file_section_index,
+                        source_token_count,
                         input_text,
                         token_count,
                     )
@@ -197,10 +205,18 @@ def chunk_commit_record(
             target_message=record.target_message,
             file_path=section.path,
             change_type=section.change_type,
+            file_section_index=file_section_index,
+            source_token_count=source_token_count,
             chunk_index=index,
             chunk_count=total_chunks,
             input_text=input_text,
             input_token_count=token_count,
         )
-        for index, (section, input_text, token_count) in enumerate(prepared)
+        for index, (
+            section,
+            file_section_index,
+            source_token_count,
+            input_text,
+            token_count,
+        ) in enumerate(prepared)
     ]
