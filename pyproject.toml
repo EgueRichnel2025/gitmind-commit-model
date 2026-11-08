@@ -18,6 +18,14 @@ dev = [
     "ruff>=0.9",
 ]
 
+experiment = [
+    "datasets>=5.0.1,<5.2.0",
+    "huggingface-hub>=0.34.0,<1.0",
+    "transformers==4.57.6",
+    "tokenizers==0.22.2",
+    "sentencepiece>=0.1.91,!=0.1.92",
+]
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
