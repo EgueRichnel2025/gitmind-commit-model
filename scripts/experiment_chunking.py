@@ -26,21 +26,16 @@ def generate_diff(tokenizer: Any, target_tokens: int) -> str:
 
         for index in range(pair_count):
             lines.append(
-                f"+    result_{index} = "
-                f"calculate_total(price_{index}, quantity_{index}) "
-                "+ tax\n"
+                f"+    result_{index} = calculate_total(price_{index}, quantity_{index}) + tax\n"
             )
             lines.append(
-                f"-    result_{index} = "
-                f"calculate_total(price_{index}, quantity_{index})\n"
+                f"-    result_{index} = calculate_total(price_{index}, quantity_{index})\n"
             )
 
         return "".join(lines)
 
     def count_tokens(text: str) -> int:
-        return len(
-            tokenizer.backend_tokenizer.encode(text).ids
-        )
+        return len(tokenizer.backend_tokenizer.encode(text).ids)
 
     low = 1
     high = 1
@@ -60,9 +55,7 @@ def generate_diff(tokenizer: Any, target_tokens: int) -> str:
 
     best_count = min(
         candidates,
-        key=lambda value: abs(
-            count_tokens(render(value)) - target_tokens
-        ),
+        key=lambda value: abs(count_tokens(render(value)) - target_tokens),
     )
 
     return render(best_count)
@@ -99,9 +92,7 @@ def build_record(
 
 
 def count_tokens(tokenizer: Any, text: str) -> int:
-    return len(
-        tokenizer.backend_tokenizer.encode(text).ids
-    )
+    return len(tokenizer.backend_tokenizer.encode(text).ids)
 
 
 def benchmark_record(
@@ -113,8 +104,7 @@ def benchmark_record(
     """Run chunking and validate every generated sequence."""
 
     source_tokens = {
-        section.path: count_tokens(tokenizer, section.diff)
-        for section in record.file_sections
+        section.path: count_tokens(tokenizer, section.diff) for section in record.file_sections
     }
 
     started = perf_counter()
@@ -131,19 +121,15 @@ def benchmark_record(
     if not chunks:
         raise AssertionError("No chunks were generated.")
 
-    actual_lengths = [
-        count_tokens(tokenizer, chunk.input_text)
-        + 2  # CodeT5 special tokens
-        for chunk in chunks
-    ]
+    actual_lengths = [count_tokens(tokenizer, chunk.input_text) for chunk in chunks]
 
     if max(actual_lengths) > 512:
-        raise AssertionError(
-            f"Token budget exceeded: {max(actual_lengths)}"
-        )
+        raise AssertionError(f"Token budget exceeded: {max(actual_lengths)}")
 
-    if any(length != chunk.input_token_count
-           for length, chunk in zip(actual_lengths, chunks)):
+    if any(
+        length != chunk.input_token_count
+        for length, chunk in zip(actual_lengths, chunks, strict=True)
+    ):
         raise AssertionError("Stored token counts do not match.")
 
     if any(chunk.chunk_count != len(chunks) for chunk in chunks):
@@ -155,15 +141,10 @@ def benchmark_record(
     if len({chunk.file_path for chunk in chunks}) != expected_file_count:
         raise AssertionError("Some modified files have no generated chunks.")
 
-    if any(
-        chunk.target_message != record.target_message
-        for chunk in chunks
-    ):
+    if any(chunk.target_message != record.target_message for chunk in chunks):
         raise AssertionError("Commit target was not preserved.")
 
-    chunks_per_file = Counter(
-        chunk.file_path for chunk in chunks
-    )
+    chunks_per_file = Counter(chunk.file_path for chunk in chunks)
 
     total_source_tokens = sum(source_tokens.values())
     total_window_tokens = sum(
@@ -253,10 +234,7 @@ def main() -> None:
 
     print("\nExpérience : 20 000 tokens, cinq fichiers")
 
-    multi_targets = {
-        f"src/module_{index}.py": 4_000
-        for index in range(1, 6)
-    }
+    multi_targets = {f"src/module_{index}.py": 4_000 for index in range(1, 6)}
 
     record = build_record(
         tokenizer,
